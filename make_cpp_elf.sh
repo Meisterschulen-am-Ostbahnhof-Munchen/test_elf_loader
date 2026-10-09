@@ -1,5 +1,6 @@
 #!/bin/bash
 # Baut die C++-ELF-App (cpp_app) und den Host (elf_host), der sie per LittleFS laedt.
+# Aufruf: source ./make_cpp_elf.sh  (das IDF-Activate-Skript verlangt source)
 set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
