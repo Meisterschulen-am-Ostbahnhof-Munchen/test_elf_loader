@@ -74,6 +74,11 @@ private:
 };
 
 #if TEST_GLOBALS
+// plain C-style ctor/dtor: land in .init_array / .fini_array
+// (the fini one runs from esp_elf_deinit(), i.e. AFTER main() returned and the shell printed "Success ...")
+extern "C" __attribute__((constructor(101))) void early_ctor(void) { printf("early_ctor (init_array, priority 101)\n"); }
+extern "C" __attribute__((destructor)) void late_dtor(void) { printf("late_dtor (fini_array)\n"); }
+
 static Counter s_counter;   // needs .init_array to be executed by the loader
 #endif
 

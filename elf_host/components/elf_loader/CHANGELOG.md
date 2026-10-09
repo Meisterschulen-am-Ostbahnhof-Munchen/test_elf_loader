@@ -1,5 +1,10 @@
 # ChangeLog
 
+## Unreleased
+
+* Run `.preinit_array` / `.init_array` of a loaded ELF before its entry point (C++ static constructors), and `.fini_array` in reverse order in `esp_elf_deinit()`
+* Documented how to build C++ ELF applications
+
 ## v1.3.3 - 2026-07-28
 
 * Fixed intermittent crash during long-term ELF execution from PSRAM on ESP32-S31 (use full cache flush instead of ranged API)
