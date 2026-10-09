@@ -129,7 +129,10 @@ extern "C" {
 #define ELF_SEC_DATA            2
 #define ELF_SEC_RODATA          3
 #define ELF_SEC_DRLRO           4
-#define ELF_SECS                5
+#define ELF_SEC_PREINIT         5
+#define ELF_SEC_INIT            6
+#define ELF_SEC_FINI            7
+#define ELF_SECS                8
 
 #define ELF_ST_BIND(_i)         ((_i) >> 4)
 #define ELF_ST_TYPE(_i)         ((_i) & 0xf)
@@ -259,6 +262,8 @@ typedef struct esp_elf {
     uint32_t        init_cnt;           /*!< number of .init_array entries */
     void (**fini_array)(void);          /*!< .fini_array in memory, NULL if none */
     uint32_t        fini_cnt;           /*!< number of .fini_array entries */
+    bool            init_rev;           /*!< run init functions backwards (legacy .ctors) */
+    bool            fini_rev;           /*!< run fini functions backwards (.fini_array) */
     bool            init_done;          /*!< constructors already run */
 
 #ifdef CONFIG_ELF_LOADER_SET_MMU

@@ -74,3 +74,5 @@ elf_host/sdkconfig*
 !elf_host/sdkconfig.defaults*
 !cpp_app/sdkconfig.defaults*
 elf_host/main/fs_image/riscv/cpp_app.elf
+elf_host/main/fs_image/xtensa/cpp_app.elf
+build_*/
