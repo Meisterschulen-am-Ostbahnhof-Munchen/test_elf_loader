@@ -15,4 +15,4 @@ against the host tables (`esp_elf_register_symbol`), never against another loade
   B holds raw pointers into A's code and vtables, the loader tracks no dependencies. Loading B after A is gone fails in relocate (-ENOSYS), B never runs.
 
 Run: `source ./make_two_elf.sh [esp32s31|esp32s3]`, then in the shell `twoelf ok <arch>/lib_a.elf <arch>/lib_b.elf`
-and `twoelf a-first ...`. Status: written, NOT built/tested yet.
+and `twoelf a-first ...`. Status: tested on ESP32-S31 (RISC-V) and ESP32-S3 (Xtensa), both scenarios (`ok`, `a-first`) behave as described.
