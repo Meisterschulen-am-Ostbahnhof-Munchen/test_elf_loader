@@ -20,6 +20,7 @@
 #endif
 
 extern void cpp_symbols_register(void);
+extern void two_elf_register(void);
 
 static const char *TAG = "elf_console";
 
@@ -49,6 +50,7 @@ int app_main(void)
 #ifdef CONFIG_ELF_SHELL
     shell_init();
 #endif
+    two_elf_register();   /* needs the console created by shell_init() */
 
     return 0;
 }

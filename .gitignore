@@ -76,3 +76,9 @@ elf_host/sdkconfig*
 elf_host/main/fs_image/riscv/cpp_app.elf
 elf_host/main/fs_image/xtensa/cpp_app.elf
 build_*/
+two_elf/*/sdkconfig*
+!two_elf/*/sdkconfig.defaults*
+two_elf/*/build*/
+two_elf/*/managed_components/
+elf_host/main/fs_image/riscv/lib_*.elf
+elf_host/main/fs_image/xtensa/lib_*.elf
