@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-* Run `.preinit_array` / `.init_array` of a loaded ELF before its entry point (C++ static constructors), and `.fini_array` in reverse order in `esp_elf_deinit()`
+* Run `.preinit_array` / `.init_array` (or legacy `.ctors`) of a loaded ELF before its entry point (C++ static constructors), and `.fini_array` (or `.dtors`) in `esp_elf_deinit()`; the arrays are now also loaded into memory in section mode (ESP32/ESP32-S2/ESP32-S3)
 * Documented how to build C++ ELF applications
 
 ## v1.3.3 - 2026-07-28

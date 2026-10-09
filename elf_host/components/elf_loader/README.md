@@ -183,9 +183,9 @@ Linking lib.so completed
 
 ### C++ ELF Applications
 
-C++ ELF applications (classes, inheritance, virtual functions, `new`/`delete`, global objects) can be built with `project_elf` and loaded like C applications. This has been tested on ESP32-S31 (RISC-V). Keep in mind:
+C++ ELF applications (classes, inheritance, virtual functions, `new`/`delete`, global objects) can be built with `project_elf` and loaded like C applications. This has been tested on ESP32-S31 (RISC-V) and ESP32-S3 (Xtensa). Keep in mind:
 
-* **Static constructors:** the loader runs the ELF's `.preinit_array` and `.init_array` once before the entry point is called, and `.fini_array` (in reverse order) in `esp_elf_deinit()`.
+* **Static constructors:** the loader runs the ELF's `.preinit_array` and `.init_array` once before the entry point is called, and `.fini_array` (in reverse order) in `esp_elf_deinit()`. The Xtensa toolchain uses the legacy `.ctors` / `.dtors` sections instead, which are handled as well (`.ctors` is run backwards, as the C runtime does).
 * **C++ runtime symbols:** the built-in symbol table only contains C library symbols. The host application must export every C++ runtime symbol the ELF uses, for example `operator new`/`operator delete` and `__cxa_pure_virtual`, with `esp_elf_register_symbol()`. The undefined symbols of an ELF can be listed with `readelf -s <file>.app.elf | grep UND`. Mangled names depend on the target, on 32-bit targets `size_t` is `unsigned int`, e.g. `_Znwj` (`operator new(unsigned int)`) and `_ZdlPvj` (sized `operator delete`).
 
 ```c
