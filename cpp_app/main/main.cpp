@@ -7,20 +7,14 @@
 #include <unistd.h>
 
 #ifndef TEST_GLOBALS
-#define TEST_GLOBALS 0   // 1 = global ctor/dtor; needs loader support for .init_array (see below)
+#define TEST_GLOBALS 1   // 1 = global ctor/dtor; needs loader support for .init_array (esp-iot-solution #796)
 #endif
 
 /*
- * Minimal C++ startup runtime, because elf_loader neither runs .init_array nor
- * provides __dso_handle / __cxa_atexit. Everything lives inside the ELF.
+ * Minimal C++ runtime: the loader provides neither __dso_handle nor __cxa_atexit,
+ * so both live inside the ELF. Static constructors are run by the (patched) loader.
  */
 extern "C" {
-typedef void (*init_fn)(void);
-/* ld does NOT define these for -shared links, they stay undefined and the loader cannot
- * resolve them -> TEST_GLOBALS=1 needs .init_array handling inside elf_loader itself. */
-extern init_fn __init_array_start[];
-extern init_fn __init_array_end[];
-
 void *__dso_handle = &__dso_handle;
 
 #define MAX_ATEXIT 16
@@ -37,15 +31,6 @@ int __cxa_atexit(void (*fn)(void *), void *arg, void *)
     s_atexit_cnt++;
     return 0;
 }
-}
-
-static void cpp_startup(void)
-{
-#if TEST_GLOBALS
-    for (init_fn *f = __init_array_start; f < __init_array_end; f++) {
-        (*f)();
-    }
-#endif
 }
 
 static void cpp_shutdown(void)
@@ -94,8 +79,6 @@ static Counter s_counter;   // needs .init_array to be executed by the loader
 
 extern "C" int main(int argc, char *argv[])
 {
-    cpp_startup();
-
 #if TEST_GLOBALS
     printf("s_counter.next() = %d (expected 42 if constructor ran)\n", s_counter.next());
 #endif
