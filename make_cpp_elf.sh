@@ -20,6 +20,6 @@ cp cpp_app/build/hello_world.app.elf elf_host/main/fs_image/riscv/cpp_app.elf
 
 echo "----------------------------------------------------------------------------"
 echo " DONE. to flash type:"
-echo "cd elf_host && idf.py --preview flash storage-flash monitor"
+echo "cd elf_host && idf.py --preview flash monitor"
 echo "Dann in der Shell: exec /storage/riscv/cpp_app.elf"
 echo "----------------------------------------------------------------------------"
