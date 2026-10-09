@@ -7,8 +7,54 @@
 #include <unistd.h>
 
 #ifndef TEST_GLOBALS
-#define TEST_GLOBALS 0   // global ctor/dtor needs __dso_handle, __cxa_atexit and .init_array
+#define TEST_GLOBALS 0   // 1 = global ctor/dtor; needs loader support for .init_array (see below)
 #endif
+
+/*
+ * Minimal C++ startup runtime, because elf_loader neither runs .init_array nor
+ * provides __dso_handle / __cxa_atexit. Everything lives inside the ELF.
+ */
+extern "C" {
+typedef void (*init_fn)(void);
+/* ld does NOT define these for -shared links, they stay undefined and the loader cannot
+ * resolve them -> TEST_GLOBALS=1 needs .init_array handling inside elf_loader itself. */
+extern init_fn __init_array_start[];
+extern init_fn __init_array_end[];
+
+void *__dso_handle = &__dso_handle;
+
+#define MAX_ATEXIT 16
+static struct { void (*fn)(void *); void *arg; } s_atexit[MAX_ATEXIT];
+static int s_atexit_cnt;
+
+int __cxa_atexit(void (*fn)(void *), void *arg, void *)
+{
+    if (s_atexit_cnt >= MAX_ATEXIT) {
+        return -1;
+    }
+    s_atexit[s_atexit_cnt].fn = fn;
+    s_atexit[s_atexit_cnt].arg = arg;
+    s_atexit_cnt++;
+    return 0;
+}
+}
+
+static void cpp_startup(void)
+{
+#if TEST_GLOBALS
+    for (init_fn *f = __init_array_start; f < __init_array_end; f++) {
+        (*f)();
+    }
+#endif
+}
+
+static void cpp_shutdown(void)
+{
+    while (s_atexit_cnt > 0) {
+        s_atexit_cnt--;
+        s_atexit[s_atexit_cnt].fn(s_atexit[s_atexit_cnt].arg);
+    }
+}
 
 class Shape {
 public:
@@ -48,6 +94,8 @@ static Counter s_counter;   // needs .init_array to be executed by the loader
 
 extern "C" int main(int argc, char *argv[])
 {
+    cpp_startup();
+
 #if TEST_GLOBALS
     printf("s_counter.next() = %d (expected 42 if constructor ran)\n", s_counter.next());
 #endif
@@ -60,5 +108,6 @@ extern "C" int main(int argc, char *argv[])
     delete s;
 
     printf("C++ test done\n");
+    cpp_shutdown();
     return 0;
 }
